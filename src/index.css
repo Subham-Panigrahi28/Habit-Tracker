@@ -6,11 +6,9 @@
   font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
   line-height: 1.5;
   font-weight: 400;
-
   color-scheme: dark;
   color: rgba(255, 255, 255, 0.87);
-  background-color: #121212;
-
+  background-color: #0a0a0a;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -21,67 +19,88 @@ body {
   margin: 0;
   min-width: 320px;
   min-height: 100vh;
+  background: linear-gradient(to bottom right, #0a0a0a, #1a1a1a);
 }
 
-.task-enter {
-  opacity: 0;
-  transform: translateY(10px);
-}
-.task-enter-active {
-  opacity: 1;
-  transform: translateY(0);
-  transition: opacity 300ms, transform 300ms;
-}
-.task-exit {
-  opacity: 1;
-  transform: translateY(0);
-}
-.task-exit-active {
-  opacity: 0;
-  transform: translateY(-10px);
-  transition: opacity 300ms, transform 300ms;
+.card-gradient {
+  background: linear-gradient(145deg, rgba(26, 26, 26, 0.9), rgba(13, 13, 13, 0.9));
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
 }
 
-@keyframes check-animation {
+.progress-bar {
+  background: linear-gradient(90deg, #9580ff 0%, #5d4aff 100%);
+  transition: width 0.3s ease-in-out;
+  box-shadow: 0 0 15px rgba(149, 128, 255, 0.3);
+}
+
+.streak-badge {
+  position: relative;
+  background: linear-gradient(145deg, #9580ff, #5d4aff);
+  animation: pulse 2s infinite;
+}
+
+.streak-badge::before {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  background: linear-gradient(145deg, rgba(149, 128, 255, 0.5), rgba(93, 74, 255, 0.5));
+  border-radius: inherit;
+  z-index: -1;
+  animation: glow 2s infinite;
+}
+
+@keyframes glow {
+  0%, 100% {
+    opacity: 0.5;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.8;
+    transform: scale(1.05);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.02);
+  }
+}
+
+.task-checkbox {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.task-checkbox:checked {
+  animation: checkmark 0.3s ease-in-out forwards;
+}
+
+@keyframes checkmark {
   0% {
     transform: scale(1);
   }
   50% {
-    transform: scale(1.1);
+    transform: scale(1.2);
   }
   100% {
     transform: scale(1);
   }
 }
 
-.check-animation {
-  animation: check-animation 0.3s ease-in-out;
+.quote-fade {
+  animation: quoteFade 10s infinite;
 }
 
-.streak-badge {
-  position: relative;
-}
-
-.streak-badge::after {
-  content: '';
-  position: absolute;
-  top: -5px;
-  left: -5px;
-  right: -5px;
-  bottom: -5px;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(149, 128, 255, 0.3) 0%, rgba(149, 128, 255, 0) 70%);
-  z-index: -1;
-  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-}
-
-@keyframes pulse {
+@keyframes quoteFade {
   0%, 100% {
-    opacity: 0.7;
-    transform: scale(1);
+    opacity: 0;
+    transform: translateY(10px);
   }
-  50% {
-    opacity: 0.3;
-    transform: scale(1.05);
+  10%, 90% {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
