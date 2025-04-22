@@ -12,12 +12,15 @@ const TaskList = ({ onStreakUpdate }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [lastCompletedDate, setLastCompletedDate] = useState(null);
   
+  const completionPercentage = tasks.length > 0
+    ? (Object.values(completedTasks).filter(Boolean).length / tasks.length) * 100
+    : 0;
+
   useEffect(() => {
     const loadTaskData = async () => {
       try {
         setIsLoading(true);
         
-        // Load user's protocol
         const protocolDocRef = doc(db, 'users', currentUser.uid, 'protocol', 'current');
         const protocolDoc = await getDoc(protocolDocRef);
         
@@ -25,24 +28,19 @@ const TaskList = ({ onStreakUpdate }) => {
           setTasks(protocolDoc.data().tasks || []);
         }
         
-        // Get today's date (start of day)
         const today = startOfDay(new Date());
         const todayISO = formatISO(today);
         
-        // Reference to user's task document for today
         const taskDocRef = doc(db, 'users', currentUser.uid, 'dailyTasks', todayISO);
         const taskDoc = await getDoc(taskDocRef);
         
-        // Get user streak info
         const streakDocRef = doc(db, 'users', currentUser.uid, 'stats', 'streak');
         const streakDoc = await getDoc(streakDocRef);
         
         if (taskDoc.exists()) {
-          // We have tasks for today
           const taskData = taskDoc.data();
           setCompletedTasks(taskData.completedTasks || {});
         } else {
-          // Check if we need to reset streak
           if (streakDoc.exists()) {
             const { lastCompleted, currentStreak } = streakDoc.data();
             
@@ -50,25 +48,21 @@ const TaskList = ({ onStreakUpdate }) => {
               const lastCompletedDate = new Date(lastCompleted);
               setLastCompletedDate(lastCompletedDate);
               
-              // If last completed date is not yesterday, reset streak
               const yesterday = new Date(today);
               yesterday.setDate(yesterday.getDate() - 1);
               
               if (!isSameDay(lastCompletedDate, yesterday) && currentStreak > 0) {
-                // Reset streak
                 await setDoc(streakDocRef, {
                   currentStreak: 0,
                   lastCompleted: null,
                   highestStreak: streakDoc.data().highestStreak || 0
                 });
                 
-                // Update parent component
                 onStreakUpdate(0);
               }
             }
           }
           
-          // Create new task document for today
           await setDoc(taskDocRef, {
             date: todayISO,
             completedTasks: {}
@@ -90,11 +84,9 @@ const TaskList = ({ onStreakUpdate }) => {
 
   const handleToggleTask = async (taskId) => {
     try {
-      // Get today's date
       const today = startOfDay(new Date());
       const todayISO = formatISO(today);
       
-      // Toggle the task completion status
       const updatedCompletedTasks = {
         ...completedTasks,
         [taskId]: !completedTasks[taskId]
@@ -102,18 +94,15 @@ const TaskList = ({ onStreakUpdate }) => {
       
       setCompletedTasks(updatedCompletedTasks);
       
-      // Update Firestore
       const taskDocRef = doc(db, 'users', currentUser.uid, 'dailyTasks', todayISO);
       await setDoc(taskDocRef, {
         date: todayISO,
         completedTasks: updatedCompletedTasks
       }, { merge: true });
       
-      // Check if all tasks are completed
       const allCompleted = tasks.every(task => updatedCompletedTasks[task.id]);
       
       if (allCompleted) {
-        // Update streak
         const streakDocRef = doc(db, 'users', currentUser.uid, 'stats', 'streak');
         const streakDoc = await getDoc(streakDocRef);
         
@@ -130,7 +119,6 @@ const TaskList = ({ onStreakUpdate }) => {
             yesterday.setDate(yesterday.getDate() - 1);
             
             if (isSameDay(lastCompleted, yesterday)) {
-              // Continue streak
               currentStreak = (streakData.currentStreak || 0) + 1;
             }
           }
@@ -140,14 +128,12 @@ const TaskList = ({ onStreakUpdate }) => {
           }
         }
         
-        // Update streak document
         await setDoc(streakDocRef, {
           currentStreak,
           highestStreak,
           lastCompleted: todayISO
         }, { merge: true });
         
-        // Update parent component
         onStreakUpdate(currentStreak);
       }
     } catch (error) {
@@ -165,8 +151,21 @@ const TaskList = ({ onStreakUpdate }) => {
 
   return (
     <div className="mt-6">
-      <h2 className="text-xl font-semibold mb-4 text-text-primary">Today's Tasks</h2>
-      <div>
+      <div className="flex justify-between items-center mb-6">
+        <h2 className="text-xl font-semibold text-text-primary">Today's Tasks</h2>
+        <span className="text-sm text-text-secondary">
+          {Math.round(completionPercentage)}% Complete
+        </span>
+      </div>
+      
+      <div className="h-2 bg-background-dark rounded-full mb-8 overflow-hidden">
+        <div 
+          className="progress-bar h-full rounded-full"
+          style={{ width: `${completionPercentage}%` }}
+        />
+      </div>
+
+      <div className="space-y-4">
         {tasks.map(task => (
           <TaskItem
             key={task.id}
