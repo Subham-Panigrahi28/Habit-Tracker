@@ -6,6 +6,7 @@ import { useAuth } from '../Auth/AuthProvider';
 import TaskList from './TaskList';
 import StreakCounter from './StreakCounter';
 import ProtocolSetup from './ProtocolSetup';
+import QuoteRotator from './QuoteRotator';
 
 const Dashboard = () => {
   const { currentUser } = useAuth();
@@ -63,28 +64,33 @@ const Dashboard = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background-dark text-text-primary py-8 px-4">
-      <div className="max-w-lg mx-auto">
-        <div className="flex justify-between items-center mb-8">
-          <h1 className="text-2xl font-bold text-accent-primary">Monk Mode Tracker</h1>
-          <button
-            onClick={handleLogout}
-            className="py-2 px-4 bg-background-card hover:bg-gray-800 rounded-md text-sm transition-colors duration-300"
-          >
-            Log Out
-          </button>
-        </div>
+    <div className="min-h-screen bg-gradient-to-br from-background-dark to-background-darker py-8 px-4">
+      <div className="max-w-2xl mx-auto">
+        <div className="card-gradient rounded-2xl shadow-2xl p-8 backdrop-blur">
+          <div className="flex justify-between items-center mb-8">
+            <h1 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-accent-primary to-accent-secondary">
+              Monk Mode Tracker
+            </h1>
+            <button
+              onClick={handleLogout}
+              className="py-2 px-6 bg-background-card hover:bg-gray-800 rounded-lg text-sm transition-all duration-300 hover:shadow-lg hover:scale-105"
+            >
+              Log Out
+            </button>
+          </div>
 
-        {hasProtocol ? (
-          <>
-            <div className="mb-8 flex justify-center">
-              <StreakCounter streak={streak} />
-            </div>
-            <TaskList onStreakUpdate={handleStreakUpdate} />
-          </>
-        ) : (
-          <ProtocolSetup onProtocolCreated={handleProtocolCreated} />
-        )}
+          {hasProtocol ? (
+            <>
+              <QuoteRotator />
+              <div className="mb-12 flex justify-center">
+                <StreakCounter streak={streak} />
+              </div>
+              <TaskList onStreakUpdate={handleStreakUpdate} />
+            </>
+          ) : (
+            <ProtocolSetup onProtocolCreated={handleProtocolCreated} />
+          )}
+        </div>
       </div>
     </div>
   );
