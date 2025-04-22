@@ -7,12 +7,15 @@ import TaskList from './TaskList';
 import StreakCounter from './StreakCounter';
 import ProtocolSetup from './ProtocolSetup';
 import QuoteRotator from './QuoteRotator';
+import EditProtocol from './EditProtocol';
 
 const Dashboard = () => {
   const { currentUser } = useAuth();
   const [streak, setStreak] = useState(0);
   const [loading, setLoading] = useState(true);
   const [hasProtocol, setHasProtocol] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [currentProtocol, setCurrentProtocol] = useState(null);
 
   useEffect(() => {
     const loadUserData = async () => {
@@ -20,7 +23,12 @@ const Dashboard = () => {
         if (currentUser) {
           const protocolDocRef = doc(db, 'users', currentUser.uid, 'protocol', 'current');
           const protocolDoc = await getDoc(protocolDocRef);
-          setHasProtocol(protocolDoc.exists());
+          const hasExistingProtocol = protocolDoc.exists();
+          setHasProtocol(hasExistingProtocol);
+          
+          if (hasExistingProtocol) {
+            setCurrentProtocol(protocolDoc.data());
+          }
           
           const streakDocRef = doc(db, 'users', currentUser.uid, 'stats', 'streak');
           const streakDoc = await getDoc(streakDocRef);
@@ -55,6 +63,14 @@ const Dashboard = () => {
     setHasProtocol(true);
   };
 
+  const handleEditClick = () => {
+    setIsEditing(true);
+  };
+
+  const handleEditComplete = () => {
+    setIsEditing(false);
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-background-dark flex items-center justify-center">
@@ -71,22 +87,39 @@ const Dashboard = () => {
             <h1 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-accent-primary to-accent-secondary">
               Monk Mode Tracker
             </h1>
-            <button
-              onClick={handleLogout}
-              className="py-2 px-6 bg-background-card hover:bg-gray-800 rounded-lg text-sm transition-all duration-300 hover:shadow-lg hover:scale-105"
-            >
-              Log Out
-            </button>
+            <div className="flex gap-4">
+              {hasProtocol && !isEditing && (
+                <button
+                  onClick={handleEditClick}
+                  className="py-2 px-6 bg-accent-primary/10 hover:bg-accent-primary/20 text-accent-primary rounded-lg text-sm transition-all duration-300 hover:shadow-lg hover:scale-105"
+                >
+                  Edit Protocol
+                </button>
+              )}
+              <button
+                onClick={handleLogout}
+                className="py-2 px-6 bg-background-card hover:bg-gray-800 rounded-lg text-sm transition-all duration-300 hover:shadow-lg hover:scale-105"
+              >
+                Log Out
+              </button>
+            </div>
           </div>
 
           {hasProtocol ? (
-            <>
-              <QuoteRotator />
-              <div className="mb-12 flex justify-center">
-                <StreakCounter streak={streak} />
-              </div>
-              <TaskList onStreakUpdate={handleStreakUpdate} />
-            </>
+            isEditing ? (
+              <EditProtocol 
+                currentProtocol={currentProtocol}
+                onEditComplete={handleEditComplete}
+              />
+            ) : (
+              <>
+                <QuoteRotator />
+                <div className="mb-12 flex justify-center">
+                  <StreakCounter streak={streak} />
+                </div>
+                <TaskList onStreakUpdate={handleStreakUpdate} />
+              </>
+            )
           ) : (
             <ProtocolSetup onProtocolCreated={handleProtocolCreated} />
           )}
