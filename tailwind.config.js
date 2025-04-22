@@ -8,8 +8,9 @@ export default {
     extend: {
       colors: {
         background: {
-          dark: '#121212',
-          card: '#1e1e1e'
+          dark: '#0a0a0a',
+          darker: '#050505',
+          card: '#1a1a1a'
         },
         text: {
           primary: '#f5f5f5',
@@ -26,13 +27,9 @@ export default {
       animation: {
         'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
         'bounce-slow': 'bounce 2s infinite',
-        'glow': 'glow 1.5s ease-in-out infinite alternate'
       },
-      keyframes: {
-        glow: {
-          '0%': { 'box-shadow': '0 0 5px rgba(149, 128, 255, 0.7)' },
-          '100%': { 'box-shadow': '0 0 20px rgba(149, 128, 255, 0.9)' }
-        }
+      boxShadow: {
+        'glow': '0 0 15px rgba(149, 128, 255, 0.5)',
       }
     },
   },
