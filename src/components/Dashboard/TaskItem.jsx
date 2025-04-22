@@ -14,44 +14,38 @@ const TaskItem = ({ task, onToggle, completed }) => {
 
   return (
     <div 
-      className={`flex items-center p-4 mb-3 rounded-lg transition-all ${
+      className={`flex items-center p-4 mb-3 rounded-xl transition-all duration-300 transform hover:scale-[1.01] ${
         completed 
-          ? 'bg-accent-primary/20 border border-accent-primary/30' 
-          : 'bg-background-card border border-gray-700'
+          ? 'bg-accent-primary/10 border border-accent-primary/30' 
+          : 'bg-background-card border border-gray-800'
       }`}
     >
       <button
         onClick={handleClick}
-        className={`w-6 h-6 rounded-md border-2 flex items-center justify-center mr-4 transition-colors duration-300 ${
-          isAnimating ? 'check-animation' : ''
+        className={`relative w-6 h-6 rounded-lg border-2 flex items-center justify-center mr-4 transition-all duration-300 ${
+          isAnimating ? 'scale-110' : ''
         } ${
           completed
-            ? 'border-accent-primary bg-accent-primary'
-            : 'border-gray-600 bg-transparent hover:bg-gray-700'
+            ? 'border-accent-primary bg-accent-primary shadow-glow'
+            : 'border-gray-600 bg-transparent hover:border-accent-primary/50'
         }`}
       >
         {completed && (
-          <svg 
-            xmlns="http://www.w3.org/2000/svg" 
-            className="h-4 w-4 text-white" 
-            fill="none" 
-            viewBox="0 0 24 24" 
-            stroke="currentColor"
-          >
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
-          </svg>
+          <span className="absolute inset-0 flex items-center justify-center">
+            <span className="w-2 h-2 rounded-full bg-white"></span>
+          </span>
         )}
       </button>
       
       <div className="flex-1">
-        <h3 className={`font-medium transition-colors ${
-          completed ? 'text-text-primary line-through' : 'text-text-primary'
+        <h3 className={`font-medium transition-colors duration-300 ${
+          completed ? 'text-text-secondary line-through' : 'text-text-primary'
         }`}>
           {task.name}
         </h3>
         {task.description && (
-          <p className={`text-sm transition-colors ${
-            completed ? 'text-text-secondary line-through' : 'text-text-secondary'
+          <p className={`text-sm mt-1 transition-colors duration-300 ${
+            completed ? 'text-text-secondary/50 line-through' : 'text-text-secondary'
           }`}>
             {task.description}
           </p>
